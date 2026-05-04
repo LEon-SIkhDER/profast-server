@@ -1,4 +1,4 @@
-# Zap Shift Server
+# Pro Fast Server
 
 Zap Shift Server is the backend API for the Zap Shift parcel delivery project. It uses Express, MongoDB, Firebase Admin authentication, and Stripe payments to manage users, parcels, riders, parcel status updates, and payment records.
 
