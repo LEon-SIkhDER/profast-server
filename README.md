@@ -29,16 +29,12 @@ Create a `.env` file in the project root using `.env.example` as a guide.
 DB_USERNAME=your_mongodb_username
 DB_PASSWORD=your_mongodb_password
 SECRET_KEY=your_stripe_secret_key
+FB_SERVICE_KEY=your_base64_encoded_firebase_service_account_json
 PORT=5000
 ```
 
-The server also expects a Firebase service account file named:
+`FB_SERVICE_KEY` must be the base64-encoded value of the full Firebase service account JSON file, not only the private key.
 
-```text
-firebase-private-key.json
-```
-
-Keep `.env` and `firebase-private-key.json` private. They should not be committed to a public repository.
 
 ## Installation
 
@@ -126,4 +122,3 @@ The server uses the `zap_shift-user_db` MongoDB database with these collections:
 - `payments`
 - `users`
 - `riders`
-

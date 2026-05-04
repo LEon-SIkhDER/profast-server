@@ -16,8 +16,8 @@ app.get("/", (req, res) => {
 })
 
 const admin = require("firebase-admin");
-
-const serviceAccount = require("./firebase-private-key.json");
+const decoded = Buffer.from(process.env.FB_SERVICE_KEY, "base64").toString('utf-8')
+const serviceAccount = JSON.parse(decoded);
 
 
 admin.initializeApp({
@@ -325,7 +325,7 @@ async function run() {
 
 
         // update rider status 
-        app.patch("/pending-riders",verifyFBToken, verifyAdmin,  async (req, res) => {
+        app.patch("/pending-riders", verifyFBToken, verifyAdmin, async (req, res) => {
             const data = req.body
             const { id } = req.query
             const query = {
