@@ -222,7 +222,7 @@ async function run() {
             res.send(result)
         })
         // USER RELATED CODE ..............................................
-        app.get("/user", async (req, res) => {
+        app.get("/user", verifyFBToken, async (req, res) => {
             const { uid, email } = req.query
             let query = {}
             if (uid) {
@@ -355,10 +355,10 @@ async function run() {
         })
         // admin related code******************************************************
         app.get('/admin/parcels', verifyFBToken, verifyAdmin, async (req, res) => {
-            const { parcel_status } = req.query
+            const { parcel_status, payment_status } = req.query
 
             const query = {
-                paymentStatus: req.query.payment_status === true,
+                paymentStatus: Boolean(payment_status),
                 parcel_status
             }
             const result = await parcelCollection.find(query).toArray()
