@@ -332,14 +332,18 @@ async function run() {
                 _id: new ObjectId(id)
             }
             // const normalizedStatus = data.status === "deactivated" ? "inactive" : data.status === "approved" ? "activate" : data.status
+            const updateData = {
+                status: data.status
+            }
+            if (data.new) {
+                updateData.joinedAt = new Date()
+            }
             const update = {
-                $set: {
-                    status: data.status
-                }
+                $set: updateData
             }
             const result = await riderCollection.updateOne(query, update, { upsert: false })
             //........
-            if (data.status === "activate") {
+            if (data.status === "active") {
                 const user = await riderCollection.findOne(query)
                 const queryUser = {
                     email: user.email
