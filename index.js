@@ -141,7 +141,7 @@ async function run() {
         })
         app.patch("/parcel/:id", async (req, res) => {
             const { id } = req.params
-            const { status } = req.body
+            const { status, riderEmail } = req.body
             const query = { _id: new ObjectId(id) }
             const now = new Date()
             const update = {
@@ -152,6 +152,11 @@ async function run() {
                     statusHistory: { status: status, time: now }
 
                 }
+            }
+            if (status === "delivered") {
+                const riderQuery = { email: riderEmail }
+                const update = { $inc: { currentAssignedParcels: -1, completedDeliveries: 1 } }
+                await riderCollection.updateOne(riderQuery, update)
             }
             const result = await parcelCollection.updateOne(query, update)
             res.send(result)
@@ -337,6 +342,9 @@ async function run() {
             }
             if (data.new) {
                 updateData.joinedAt = new Date()
+                // initial data
+                updateData.currentAssignedParcels = 0
+                updateData.completedDeliveries = 0
             }
             const update = {
                 $set: updateData
@@ -393,8 +401,20 @@ async function run() {
                     statusHistory: { status: status, time: now }
                 }
             }
-            const result = await parcelCollection.updateOne(query, update, { upsert: false })
-            res.send(result)
+            const parcelResult = await parcelCollection.updateOne(query, update, { upsert: false })
+            // find out rider using rider id 
+            // increment 1 the value of currentAssignedParcels
+
+            const riderQuery = {
+                _id: new ObjectId(riderId)
+            }
+            const riderUpdate = {
+                $inc: {
+                    currentAssignedParcels: 1
+                }
+            }
+            const riderResult = await riderCollection.updateOne(riderQuery, riderUpdate)
+            res.send(parcelResult)
         })
 
 
