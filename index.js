@@ -252,6 +252,7 @@ async function run() {
             }
             data.role = "user"
             data.created_At = new Date()
+            data.lastActiveAt = new Date()
             const result = await userCollection.insertOne(data)
             res.send(result)
         })
@@ -333,6 +334,7 @@ async function run() {
         app.patch("/pending-riders", verifyFBToken, verifyAdmin, async (req, res) => {
             const data = req.body
             const { id } = req.query
+            console.log(id)
             const query = {
                 _id: new ObjectId(id)
             }
@@ -363,6 +365,7 @@ async function run() {
                 }
                 await userCollection.updateOne(queryUser, updateUser, { upsert: false })
             }
+
             res.send(result)
         })
         // admin related code******************************************************
@@ -415,6 +418,17 @@ async function run() {
             }
             const riderResult = await riderCollection.updateOne(riderQuery, riderUpdate)
             res.send(parcelResult)
+        })
+        // updating active status 
+        app.patch("/users/last-active", async (req, res) => {
+            const { uid } = req.body
+            console.log(uid)
+            const update = {
+                $set: { lastActiveAt: new Date() }
+            }
+            const result = await userCollection.updateOne({ uid }, update)
+            console.log("result", result)
+            res.send(result)
         })
 
 
