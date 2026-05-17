@@ -246,7 +246,7 @@ async function run() {
                 role: { $in: ["user", "admin"] }
             }
             if (name) {
-                query.name = name
+                query.name = { $regex: name, options: "i" }
             }
             const result = await userCollection.find(query).toArray()
             res.send(result)
@@ -306,7 +306,7 @@ async function run() {
             const { search } = req.query
             const query = { status: { $regex: "pending", $options: "i" } }
             if (search) {
-                query.name = search
+                query.name = { $regex: search, $options: "i" }
             }
             const result = await riderCollection.find(query).toArray()
             res.send(result)
