@@ -246,7 +246,7 @@ async function run() {
                 role: { $in: ["user", "admin"] }
             }
             if (name) {
-                query.name = { $regex: name, options: "i" }
+                query.name = { $regex: name, $options: "i" }
             }
             const result = await userCollection.find(query).toArray()
             res.send(result)
