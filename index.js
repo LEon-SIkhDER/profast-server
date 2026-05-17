@@ -29,6 +29,7 @@ admin.initializeApp({
 
 
 const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.7hhwads.mongodb.net/?appName=Cluster0`;
+// console.log(uri)
 // const uri = "mongodb://127.0.0.1:27017";
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -87,7 +88,7 @@ async function run() {
                 projection: { role: 1, _id: 0 }
             }
             const result = await userCollection.findOne(query, options)
-            if (!result.role === "admin") {
+            if (result.role !== "admin") {
                 return res.status(403).send({ message: "Unauthorized Access" })
 
             } else if (result.role === "admin") {
@@ -240,7 +241,14 @@ async function run() {
             res.send(result)
         })
         app.get("/users&admin", verifyFBToken, async (req, res) => {
-            const result = await userCollection.find({ role: { $in: ["user", "admin"] } }).toArray()
+            const { name } = req.query
+            const query = {
+                role: { $in: ["user", "admin"] }
+            }
+            if (name) {
+                query.name = name
+            }
+            const result = await userCollection.find(query).toArray()
             res.send(result)
         })
         app.post("/users", async (req, res) => {
