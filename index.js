@@ -114,8 +114,6 @@ async function run() {
 
         app.get("/parcels", verifyFBToken, async (req, res) => { // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx verifyFbToken
             const { email, search, riderEmail, status } = req.query
-
-
             // make query
             let query = {}
 
@@ -439,6 +437,12 @@ async function run() {
             res.send(result)
         })
 
+        // others 
+        app.get("/total-delivery-count", verifyFBToken, async (req, res) => {
+            const query = { parcel_status: "delivered" }
+            const result = await parcelCollection.countDocuments(query)
+            res.send(result)
+        })
 
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
