@@ -286,17 +286,21 @@ async function run() {
             // specific warehouse rider
             const { search, district, status, skip, limit } = req.query
             let query = {}
+            const sort = {}
+            if (status) {
+                query.status = status
+                sort._id = -1
 
+            }
             if (search) {
                 query = { name: { $regex: search, $options: "i" } }
+                sort = {}
             }
             if (district) {
                 query.district = district
             }
-            if (status) {
-                query.status = status
-            }
-            const result = await riderCollection.find(query).skip(Number(skip) || 0).limit(Number(limit) || 0).toArray()
+
+            const result = await riderCollection.find(query).sort(sort).skip(Number(skip) || 0).limit(Number(limit) || 0).toArray()
             res.send(result)
         })
 
