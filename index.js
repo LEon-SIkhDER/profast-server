@@ -116,12 +116,14 @@ async function run() {
             const { email, search, riderEmail, status } = req.query
             // make query
             let query = {}
+            let sort = { _id: -1 }
 
             if (email) {
                 query = { userEmail: email }
             }
             if (search) {
                 query.parcelName = { $regex: search, $options: "i" }
+                sort = {}
             }
             // rider assigned parcels
             if (riderEmail && status) {
@@ -135,7 +137,7 @@ async function run() {
 
             }
 
-            const result = await parcelCollection.find(query).sort({ _id: -1 }).toArray()
+            const result = await parcelCollection.find(query).sort(sort).toArray()
             res.send(result)
         })
         app.patch("/parcel/:id", async (req, res) => {
@@ -207,7 +209,7 @@ async function run() {
                 return res.status(403).send({ message: "Forbidden Access" })
             }
             const query = { email: data }
-            const result = await paymentCollection.find(query).toArray()
+            const result = await paymentCollection.find(query).sort({ _id: -1 }).toArray()
             res.send(result)
         })
         app.post("/payments", async (req, res) => {
@@ -381,12 +383,13 @@ async function run() {
         // admin related code******************************************************
         app.get('/admin/parcels', verifyFBToken, verifyAdmin, async (req, res) => {
             const { parcel_status, payment_status } = req.query
+            let sort = { _id: -1 }
 
             const query = {
                 paymentStatus: Boolean(payment_status),
                 parcel_status
             }
-            const result = await parcelCollection.find(query).toArray()
+            const result = await parcelCollection.find(query).sort(sort).toArray()
             res.send(result)
         })
 
