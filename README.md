@@ -1,6 +1,6 @@
 # Pro Fast Server
 
-Zap Shift Server is the backend API for the Zap Shift parcel delivery project. It uses Express, MongoDB, Firebase Admin authentication, and Stripe payments to manage users, parcels, riders, parcel status updates, and payment records.
+Pro Fast Server is the backend API for the Pro Fast parcel delivery project. It uses Express, MongoDB, Firebase Admin authentication, and Stripe payments to manage users, parcels, riders, parcel status updates, and payment records.
 
 ## Features
 
@@ -44,7 +44,13 @@ npm install
 
 ## Running Locally
 
-Run the server with Node:
+Run the server with npm:
+
+```bash
+npm start
+```
+
+Or run it directly with Node:
 
 ```bash
 node index.js
@@ -64,6 +70,12 @@ http://localhost:5000
 
 ## API Overview
 
+### Health
+
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| GET | `/` | Check whether the server is running |
+
 ### Parcels
 
 | Method | Endpoint | Description |
@@ -75,6 +87,7 @@ http://localhost:5000
 | DELETE | `/parcel` | Delete a parcel by query `id` |
 | GET | `/admin/parcels` | Get admin parcel list by payment and parcel status |
 | PATCH | `/assign-rider` | Assign a rider to a parcel |
+| GET | `/total-delivery-count` | Get the total delivered parcel count |
 
 ### Payments
 
@@ -92,6 +105,7 @@ http://localhost:5000
 | GET | `/users&admin` | Get users with `user` or `admin` roles |
 | POST | `/users` | Create a user if one does not already exist |
 | PATCH | `/user/:id` | Update a user |
+| PATCH | `/users/last-active` | Update a user's last active timestamp |
 | GET | `/role/:email` | Get a user's role |
 
 ### Riders
