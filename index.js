@@ -135,7 +135,7 @@ async function run() {
 
             }
 
-            const result = await parcelCollection.find(query).toArray()
+            const result = await parcelCollection.find(query).sort({ _id: -1 }).toArray()
             res.send(result)
         })
         app.patch("/parcel/:id", async (req, res) => {
