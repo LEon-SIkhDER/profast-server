@@ -44,7 +44,7 @@ const client = new MongoClient(uri, {
 async function run() {
     try {
         // Connect the client to the server	(optional starting in v4.7)
-        await client.connect();
+        // await client.connect();
         // Send a ping to confirm a successful connection
         const db = client.db("zap_shift-user_db")
         // collection 
@@ -357,7 +357,7 @@ async function run() {
             if (data.new) {
                 updateData.joinedAt = new Date()
                 // initial data
-                updateData.currentAssignedParcels = 0
+                updateData.currentAssignedDeliveries = 0
                 updateData.completedDeliveries = 0
             }
             const update = {
