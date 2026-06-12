@@ -44,7 +44,7 @@ const client = new MongoClient(uri, {
 async function run() {
     try {
         // Connect the client to the server	(optional starting in v4.7)
-        // await client.connect();
+        await client.connect();
         // Send a ping to confirm a successful connection
         const db = client.db("zap_shift-user_db")
         // collection 
@@ -288,7 +288,7 @@ async function run() {
             // specific warehouse rider
             const { search, district, status, skip, limit } = req.query
             let query = {}
-            const sort = {}
+            let sort = {}
             if (status) {
                 query.status = status
                 sort._id = -1
