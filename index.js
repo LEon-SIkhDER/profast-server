@@ -295,15 +295,19 @@ async function run() {
 
             }
             if (search) {
-                query = { name: { $regex: search, $options: "i" } }
+                query.name = { $regex: search, $options: "i" }
                 sort = {}
             }
             if (district) {
                 query.district = district
             }
-
             const result = await riderCollection.find(query).sort(sort).skip(Number(skip) || 0).limit(Number(limit) || 0).toArray()
+            if (skip || limit) {
+                const totalDataCount = await riderCollection.countDocuments(query)
+                res.send({ result, totalDataCount })
+            }
             res.send(result)
+            // console.log(totalDataCount)
         })
 
         app.get("/pending-riders", verifyFBToken, verifyAdmin, async (req, res) => {
@@ -346,7 +350,7 @@ async function run() {
         app.patch("/pending-riders", verifyFBToken, verifyAdmin, async (req, res) => {
             const data = req.body
             const { id } = req.query
-            console.log(id)
+            // console.log(id)
             const query = {
                 _id: new ObjectId(id)
             }
@@ -435,12 +439,12 @@ async function run() {
         // updating active status 
         app.patch("/users/last-active", async (req, res) => {
             const { uid } = req.body
-            console.log(uid)
+            // console.log(uid)
             const update = {
                 $set: { lastActiveAt: new Date() }
             }
             const result = await userCollection.updateOne({ uid }, update)
-            console.log("result", result)
+            // console.log("result", result)
             res.send(result)
         })
 
@@ -458,16 +462,6 @@ async function run() {
     }
 }
 run().catch(console.dir);
-
-
-
-
-
-
-
-
-
-
 app.listen(port, () => {
     console.log(`Server is running on port:${port}`)
 })
