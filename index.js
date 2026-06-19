@@ -113,7 +113,7 @@ async function run() {
         })
 
         app.get("/parcels", verifyFBToken, async (req, res) => { // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx verifyFbToken
-            const { email, search, riderEmail, status } = req.query
+            const { email, search, riderEmail, status, skip, limit } = req.query
             // make query
             let query = {}
             let sort = { _id: -1 }
@@ -137,7 +137,12 @@ async function run() {
 
             }
 
-            const result = await parcelCollection.find(query).sort(sort).toArray()
+            const result = await parcelCollection.find(query).sort(sort).skip(Number(skip) || 0).limit(Number(limit) || 0).toArray()
+            if (skip || limit) {
+                const totalDataCount = await parcelCollection.countDocuments(query)
+                res.send({ result, totalDataCount })
+                return
+            }
             res.send(result)
         })
         app.patch("/parcel/:id", async (req, res) => {
@@ -305,6 +310,7 @@ async function run() {
             if (skip || limit) {
                 const totalDataCount = await riderCollection.countDocuments(query)
                 res.send({ result, totalDataCount })
+                return
             }
             res.send(result)
             // console.log(totalDataCount)

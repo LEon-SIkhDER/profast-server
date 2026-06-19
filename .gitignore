@@ -2,3 +2,6 @@
 node_modules
 firebase-private-key.json
 convert.js 
+fixWarehouse.js
+warehouses.json
+riders.json
