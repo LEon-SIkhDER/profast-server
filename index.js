@@ -549,13 +549,13 @@ async function run() {
             // const parcelDataAsyncArr = [unassignedParcelsCount, paidParcelCount, totalRevenue]
             const result = {
                 // from parcels
-                unassignedParcelsCount: dataFromParcels.unassignedParcelsCount[0].count,
-                paidParcelCount: dataFromParcels.parcels[0].paidParcelCount,
-                totalRevenue: dataFromParcels.parcels[0].totalRevenue,
+                unassignedParcelsCount: dataFromParcels.unassignedParcelsCount[0]?.count || 0,
+                paidParcelCount: dataFromParcels.parcels[0]?.paidParcelCount || 0,
+                totalRevenue: dataFromParcels.parcels[0]?.totalRevenue || 0,
                 // from rider
-                activeRiderCount: dataFromRider.activeRider[0].activeRiderCount,
-                inactiveRiderCount: dataFromRider.inactiveRider[0].inactiveRiderCount,
-                pendingRiderCount: dataFromRider.pendingRider[0].pendingRiderCount,
+                activeRiderCount: dataFromRider.activeRider[0]?.activeRiderCount || 0,
+                inactiveRiderCount: dataFromRider.inactiveRider[0]?.inactiveRiderCount || 0,
+                pendingRiderCount: dataFromRider.pendingRider[0]?.pendingRiderCount || 0,
                 deliveryLoad: deliveryLoad
             }
             // res.send(dataFromParcels.activeRider)
