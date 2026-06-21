@@ -126,15 +126,16 @@ async function run() {
                 sort = {}
             }
             // rider assigned parcels
-            if (riderEmail && status) {
+            if (riderEmail) {
                 query = { "rider.riderEmail": riderEmail }
+            }
+            if (status) {
                 if (Array.isArray(status)) {
                     query.parcel_status = { $in: status }
                 }
                 else {
                     query.parcel_status = status
                 }
-
             }
 
             const result = await parcelCollection.find(query).sort(sort).skip(Number(skip) || 0).limit(Number(limit) || 0).toArray()
@@ -454,6 +455,112 @@ async function run() {
             res.send(result)
         })
 
+        // admin
+        app.get("/admin/dashboard", async (req, res) => {
+            const { paymentStatus = true, parcel_status = "not-collected" } = req.query
+            // delivery load
+            const dataFromParcels = (await parcelCollection.aggregate([{
+                $facet: {
+                    parcels: [
+                        {
+                            $match: {
+                                paymentStatus
+                            }
+                        },
+                        {
+                            $group: {
+                                _id: null,
+                                totalRevenue: {
+                                    $sum: {
+                                        $multiply: ["$cost", 0.8]
+                                    }
+                                },
+                                paidParcelCount: { $sum: 1 }
+                            }
+                        }
+                    ],
+                    unassignedParcelsCount: [
+                        {
+                            $match: {
+                                parcel_status,
+                                paymentStatus: true
+                            }
+                        },
+                        {
+                            $count: 'count'
+                        }
+                    ],
+                    parcelData: [
+                        {
+                            $match: {
+                                parcel_status: { $in: ["in-transit", "rider-assigned"] }
+                            }
+                        },
+                        {
+                            $group: {
+                                _id: "$senderDistrict",
+                                parcel: { $sum: 1 }
+                            }
+                        }
+                    ],
+
+
+                }
+            }]).toArray())[0]
+
+            const dataFromRider = (await riderCollection.aggregate([{
+                $facet: {
+                    riderData: [
+                        {
+                            $group: {
+                                _id: "$district",
+                                rider: { $sum: 1 }
+                            }
+                        }
+                    ],
+                    activeRider: [
+                        {
+                            $match: { status: "active" }
+                        },
+                        { $count: 'activeRiderCount' }
+                    ],
+                    inactiveRider: [
+                        {
+                            $match: { status: "inactive" }
+                        },
+                        {
+                            $count: 'inactiveRiderCount'
+                        }
+                    ],
+                    pendingRider: [
+                        {
+                            $match: { status: "pending" }
+                        },
+                        {
+                            $count: "pendingRiderCount"
+                        }
+                    ]
+                }
+            }]).toArray())[0]
+            const deliveryLoad = dataFromParcels.parcelData.map((data) => {
+                const riderCount = dataFromRider.riderData.find(rider => rider._id === data._id)?.rider || 0
+                return { district: data._id, parcel: data.parcel, rider: riderCount }
+            })
+            // const parcelDataAsyncArr = [unassignedParcelsCount, paidParcelCount, totalRevenue]
+            const result = {
+                // from parcels
+                unassignedParcelsCount: dataFromParcels.unassignedParcelsCount[0].count,
+                paidParcelCount: dataFromParcels.parcels[0].paidParcelCount,
+                totalRevenue: dataFromParcels.parcels[0].totalRevenue,
+                // from rider
+                activeRiderCount: dataFromRider.activeRider[0].activeRiderCount,
+                inactiveRiderCount: dataFromRider.inactiveRider[0].inactiveRiderCount,
+                pendingRiderCount: dataFromRider.pendingRider[0].pendingRiderCount,
+                deliveryLoad: deliveryLoad
+            }
+            // res.send(dataFromParcels.activeRider)
+            res.send(result)
+        })
         // others 
         app.get("/total-delivery-count", verifyFBToken, async (req, res) => {
             const query = { parcel_status: "delivered" }
